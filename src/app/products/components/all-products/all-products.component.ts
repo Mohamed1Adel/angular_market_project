@@ -1,4 +1,7 @@
+
 import { Component } from '@angular/core';
+import { product } from 'src/app/carts/Models/product';
+
 import { ProductsService } from '../../services/products.service';
 
 @Component({
@@ -7,9 +10,10 @@ import { ProductsService } from '../../services/products.service';
   styleUrls: ['./all-products.component.css'],
 })
 export class AllProductsComponent {
-  products: any[] = [];
-  categories: any[] = [];
+  products: product[] = [];
+  categories: string[] = [];
   loading: boolean = false;
+  cartProducts: any[] = [];
 
   constructor(private service: ProductsService) {}
 
@@ -29,6 +33,8 @@ export class AllProductsComponent {
       (err) => alert(err.status)
     );
   }
+
+  
   getCategories() {
     this.loading = true;
     this.service.getAllCategories().subscribe(
@@ -63,5 +69,24 @@ export class AllProductsComponent {
     });
   }
 
+  addToCart(event: any) {
+    // console.log(event)
 
+    // this.cartProducts = localStorage.getItem('cart')
+    if ('cart' in localStorage) {
+      this.cartProducts = JSON.parse(localStorage.getItem('cart')!);
+      let exist = this.cartProducts.find((item) => item.item.id == event.item.id);
+      if (exist) {
+        alert('product is already added in your cart');
+      } else {
+        this.cartProducts.push(event);
+        localStorage.setItem('cart', JSON.stringify(this.cartProducts));
+      }
+    } else {
+      this.cartProducts.push(event);
+      localStorage.setItem('cart', JSON.stringify(this.cartProducts));
+    }
+
+    // localStorage.setItem('cart', JSON.stringify(event));
+  }
 }
